@@ -33,7 +33,14 @@ function App() {
             }
           />
           {/* <Route path="register" element={<Register />} /> */}
-          {/* <Route path="change-password" element={<ChangePassword />} /> */}
+          <Route
+            path="change-password"
+            element={
+              <PrivateRoute>
+                <>Test</>
+              </PrivateRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>
