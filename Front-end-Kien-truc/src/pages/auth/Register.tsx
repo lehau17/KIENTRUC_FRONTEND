@@ -32,8 +32,8 @@ const RegisterPage: React.FC = () => {
           Sign Up
         </Button>
 
-        <div style={{ textAlign: "center", marginTop: "10px" }}>
-          <p>Or sign up with:</p>
+        <div className="text-center p-2">
+          <p className="p-3">Or sign up with:</p>
           <FacebookOutlined style={iconStyle} />
           <TwitterOutlined style={iconStyle} />
           <GoogleOutlined style={iconStyle} />

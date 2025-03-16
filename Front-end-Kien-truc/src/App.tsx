@@ -2,8 +2,9 @@ import { JSX } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
-import RegisterPage from "./pages/auth/Login";
+import RegisterPage from "./pages/auth/Register";
 import AuthLayout from "./layouts/auth/AuthLayout";
+import LoginPage from "./pages/auth/LoginPage";
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = false;
@@ -20,6 +21,14 @@ function App() {
             element={
               <AuthLayout>
                 <RegisterPage />
+              </AuthLayout>
+            }
+          />
+          <Route
+            path="login"
+            element={
+              <AuthLayout>
+                <LoginPage />
               </AuthLayout>
             }
           />

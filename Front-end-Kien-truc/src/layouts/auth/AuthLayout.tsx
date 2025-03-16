@@ -2,7 +2,12 @@ import { Row, Col } from "antd";
 
 const AuthLayout = ({ children }: { children: any }) => {
   return (
-    <div className="max-h-screen flex items-center">
+    <div
+      className=" h-screen flex w-screen"
+      style={{
+        background: "linear-gradient(to right, #e0f2ff, #b3e0ff)", // Màu xanh dương nhạt
+      }}
+    >
       <Row gutter={[16, 16]} align="middle">
         {/* Bên trái */}
         <Col xs={24} md={12} style={{ textAlign: "center" }}>
