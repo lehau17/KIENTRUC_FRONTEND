@@ -30,8 +30,8 @@ export const useAddEmployee = () => {
 export const useUpdateEmployee = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (updatedEmployee) => {
-            const response = await axiosInstance.put(`/employees/${updatedEmployee._id}`, updatedEmployee);
+        mutationFn: async ({ id, ...data }) => {
+            const response = await axiosInstance.patch(`/employees/${id}`, data);
             return response.data;
         },
         onSuccess: () => {

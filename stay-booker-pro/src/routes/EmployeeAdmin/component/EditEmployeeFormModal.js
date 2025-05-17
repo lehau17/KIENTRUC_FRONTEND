@@ -6,13 +6,16 @@ const { Option } = Select;
 const EditEmployeeFormModal = ({ visible, onClose, onSubmit, employee }) => {
     const [form] = Form.useForm();
 
+    // Lưu lại giá trị ban đầu của employee để so sánh khi submit
+    const initialValues = {
+        fullname: employee?.fullname || '',
+        email: employee?.email || '',
+        role: employee?.role?.role || '',
+    };
+
     useEffect(() => {
         if (employee) {
-            form.setFieldsValue({
-                fullname: employee.fullname,
-                email: employee.email,
-                role: employee.role.role,
-            });
+            form.setFieldsValue(initialValues);
         }
     }, [employee, form]);
 
@@ -21,7 +24,19 @@ const EditEmployeeFormModal = ({ visible, onClose, onSubmit, employee }) => {
             .validateFields()
             .then((values) => {
                 form.resetFields();
-                onSubmit({ ...employee, ...values });
+
+                // 📝 So sánh các giá trị mới với giá trị cũ, chỉ lấy các trường thay đổi
+                const updatedFields = Object.keys(values).reduce((acc, key) => {
+                    if (values[key] !== initialValues[key]) {
+                        acc[key] = values[key];
+                    }
+                    return acc;
+                }, {});
+
+                if (Object.keys(updatedFields).length > 0) {
+                    // 🏷️ Chỉ submit các trường thay đổi
+                    onSubmit({ id: employee.id, ...updatedFields });
+                }
             })
             .catch((info) => {
                 console.log('Validate Failed:', info);
@@ -62,6 +77,8 @@ const EditEmployeeFormModal = ({ visible, onClose, onSubmit, employee }) => {
                     <Select placeholder="Select Role">
                         <Option value="ADMIN">Admin</Option>
                         <Option value="USER">User</Option>
+                        <Option value="EMPLOYEE">Employee</Option>
+                        <Option value="MANAGER">Manager</Option>
                     </Select>
                 </Form.Item>
             </Form>
