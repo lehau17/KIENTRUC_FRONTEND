@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 import AboutUs from './routes/about-us/AboutUs';
+import Admin from './routes/admin/Admin';
 import ForgotPassword from './routes/forgot-password/ForgotPassword';
 import Home from './routes/home/Home';
 import HotelDetails from './routes/hotel-details/HotelDetails';
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
             {
                 path: '/booking-confirmation',
                 element: <BookingConfirmation />,
+            },
+            {
+                path: '/admin',
+                element: <Admin />,
             },
         ],
     },

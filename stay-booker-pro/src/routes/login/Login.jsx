@@ -18,6 +18,8 @@ const Login = () => {
         username: '',
         password: '',
     });
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectUrl = searchParams.get('redirect');
     const { mutate, isLoading, isError, error } = useLogin();
 
     const [errorMessage, setErrorMessage] = useState(false);
@@ -51,7 +53,7 @@ const Login = () => {
         mutate(loginData, {
             onSuccess: () => {
                 triggerAuthCheck();
-                navigate('/');
+                navigate(redirectUrl ? decodeURIComponent(redirectUrl) : '/');
             },
             onError: (err) => {
                 console.log(err)

@@ -22,6 +22,13 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+// Điều hướng đến login kèm theo path hiện tại (không có host)
+const navigateToLogin = () => {
+    localStorage.removeItem('accessToken');
+    const currentPath = window.location.pathname + window.location.search;
+    window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+};
+
 // Xử lý lỗi response từ server
 axiosInstance.interceptors.response.use(
     (response) => {
@@ -29,13 +36,15 @@ axiosInstance.interceptors.response.use(
     },
     (error) => {
         if (error.response) {
-            // Request đã gửi nhưng server trả lỗi (4xx, 5xx)
-            console.error('API Error:', error.response.data.message);
+            if (error.response.status === 401) {
+                console.warn('⚠️ Unauthorized - Redirecting to login');
+                navigateToLogin();
+            } else {
+                console.error('API Error:', error.response.data.message);
+            }
         } else if (error.request) {
-            // Request đã gửi nhưng không nhận được phản hồi
             console.error('Network Error:', error.message);
         } else {
-            // Lỗi khác
             console.error('Error:', error.message);
         }
         return Promise.reject(error);
