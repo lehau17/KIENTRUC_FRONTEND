@@ -1,5 +1,6 @@
 import { Layout, Typography } from 'antd';
 import { useState } from 'react';
+import EmployeeAdmin from 'routes/EmployeeAdmin/EmployeeAdmin';
 import Sidebar from './component/Sidebar';
 
 const { Header, Content, Footer } = Layout;
@@ -11,7 +12,7 @@ const Admin = () => {
     const renderContent = () => {
         switch (selectedPage) {
             case 'employees':
-                return <Title level={2}>Danh sách nhân viên</Title>;
+                return <EmployeeAdmin />
             case 'rooms':
                 return <Title level={2}>Danh sách phòng</Title>;
             case 'invoices':

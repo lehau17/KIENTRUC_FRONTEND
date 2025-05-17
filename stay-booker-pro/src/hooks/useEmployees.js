@@ -6,7 +6,7 @@ export const useEmployees = () => {
     return useQuery({
         queryKey: ['employees'],
         queryFn: async () => {
-            const response = await axiosInstance.get('/api/employees');
+            const response = await axiosInstance.get('/employees');
             return response.data;
         },
         retry: 2,
@@ -18,7 +18,7 @@ export const useAddEmployee = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (newEmployee) => {
-            const response = await axiosInstance.post('/api/employees', newEmployee);
+            const response = await axiosInstance.post('/employees', newEmployee);
             return response.data;
         },
         onSuccess: () => {
@@ -31,7 +31,7 @@ export const useUpdateEmployee = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (updatedEmployee) => {
-            const response = await axiosInstance.put(`/api/employees/${updatedEmployee._id}`, updatedEmployee);
+            const response = await axiosInstance.put(`/employees/${updatedEmployee._id}`, updatedEmployee);
             return response.data;
         },
         onSuccess: () => {
@@ -44,7 +44,7 @@ export const useDeleteEmployee = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (employeeId) => {
-            await axiosInstance.delete(`/api/employees/${employeeId}`);
+            await axiosInstance.delete(`/employees/${employeeId}`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries(['employees']);
