@@ -42,8 +42,8 @@ const EmployeeTable = ({ data, onEdit }) => {
         {
             title: 'Actions',
             key: 'actions',
-            render: (_, record) => (
-                <Space>
+            render: (_, record) => {
+                return <Space>
                     <Button type="primary" onClick={() => onEdit(record)}>
                         Edit
                     </Button>
@@ -56,7 +56,7 @@ const EmployeeTable = ({ data, onEdit }) => {
                         <Button type="danger">Delete</Button>
                     </Popconfirm>
                 </Space>
-            ),
+            }
         },
     ];
 
