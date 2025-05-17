@@ -1,24 +1,28 @@
 import { createContext, useEffect, useState } from 'react';
-import { networkAdapter } from 'services/NetworkAdapter';
 
 export const AuthContext = createContext();
 
 /**
  * Provides authentication state and user details to the application.
- * @namespace AuthProvider
- * @component
  */
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
     const [authCheckTrigger, setAuthCheckTrigger] = useState(false);
 
+    /**
+     * Kiểm tra trạng thái đăng nhập khi được trigger
+     */
     useEffect(() => {
-        const checkAuthStatus = async () => {
-            const response = await networkAdapter.get('api/users/auth-user');
-            if (response && response.data) {
-                setIsAuthenticated(response.data.isAuthenticated);
-                setUserDetails(response.data.userDetails);
+        const checkAuthStatus = () => {
+            const token = localStorage.getItem('accessToken');
+            const userInfo = localStorage.getItem('userInfo');
+            if (token && userInfo) {
+                setIsAuthenticated(true);
+                setUserDetails(JSON.parse(userInfo));
+            } else {
+                setIsAuthenticated(false);
+                setUserDetails(null);
             }
         };
 
