@@ -23,6 +23,14 @@ import UserProfile from './routes/user-profile/UserProfile';
 
 
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 2, // Thử lại 2 lần nếu lỗi
+            refetchOnWindowFocus: false, // Không refetch khi focus lại window
+        },
+    },
+});
 
 makeServer();
 
