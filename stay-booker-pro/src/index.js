@@ -5,7 +5,6 @@ import BookingConfirmation from 'routes/booking-confimation/BookingConifrmation'
 import Checkout from 'routes/checkout/Checkout';
 import { AuthProvider } from './contexts/AuthContext';
 import './index.scss';
-import { makeServer } from './mirage/mirageServer';
 import reportWebVitals from './reportWebVitals';
 import AboutUs from './routes/about-us/AboutUs';
 import ForgotPassword from './routes/forgot-password/ForgotPassword';
@@ -32,7 +31,6 @@ const queryClient = new QueryClient({
     },
 });
 
-makeServer();
 
 const router = createBrowserRouter([
     {
