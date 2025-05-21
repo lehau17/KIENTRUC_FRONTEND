@@ -1,7 +1,9 @@
 import DateRangePicker from 'components/ux/data-range-picker/DateRangePicker';
 import Toast from 'components/ux/toast/Toast';
+import { AuthContext } from 'contexts/AuthContext'; // giả sử file bạn lưu là vậy
 import { differenceInCalendarDays } from 'date-fns';
 import format from 'date-fns/format';
+import { useCreateBooking } from 'hooks/useBooking';
 import { useRoomDetail } from 'hooks/useRooms';
 import queryString from 'query-string';
 import { useEffect, useState } from 'react';
@@ -15,6 +17,9 @@ const HotelBookingDetailsCard = ({ hotelCode }) => {
     const [isDatePickerVisible, setisDatePickerVisible] = useState(false);
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState('');
+    const { userDetails } = useContext(AuthContext);
+    const { mutate: createBooking, isPending } = useCreateBooking();
+
 
     // State for date range
     const [dateRange, setDateRange] = useState([
@@ -90,31 +95,50 @@ const HotelBookingDetailsCard = ({ hotelCode }) => {
         setTaxes(`${formatPrice(totalGst)} $`);
     };
 
+
+
     const onBookingConfirm = () => {
         if (!dateRange[0].startDate || !dateRange[0].endDate) {
             setErrorMessage('Please select check-in and check-out dates.');
             return;
         }
-        const checkIn = format(dateRange[0].startDate, 'dd-MM-yyyy');
-        const checkOut = format(dateRange[0].endDate, 'dd-MM-yyyy');
-        const queryParams = {
-            hotelCode,
-            checkIn,
-            checkOut,
-            guests: selectedGuests.value,
-            rooms: selectedRooms.value,
-            hotelName: bookingDetails.name.replaceAll(' ', '-'),
+
+        const checkIn = format(dateRange[0].startDate, 'yyyy-MM-dd');
+        const checkOut = format(dateRange[0].endDate, 'yyyy-MM-dd');
+
+        const payload = {
+            userId: userDetails?.id || 'anonymous',
+            roomId: hotelCode,
+            checkInAt: checkIn,
+            checkOutAt: checkOut,
+            price: taxes
         };
 
-        const url = `/checkout?${queryString.stringify(queryParams)}`;
-        navigate(url, {
-            state: {
-                total,
-                checkInTime: '14:00',
-                checkOutTime: '12:00',
+        createBooking(payload, {
+            onSuccess: () => {
+                const queryParams = {
+                    hotelCode,
+                    checkIn: format(dateRange[0].startDate, 'dd-MM-yyyy'),
+                    checkOut: format(dateRange[0].endDate, 'dd-MM-yyyy'),
+                    guests: selectedGuests.value,
+                    rooms: selectedRooms.value,
+                    hotelName: bookingDetails.name.replaceAll(' ', '-'),
+                };
+
+                navigate(`/checkout?${queryString.stringify(queryParams)}`, {
+                    state: {
+                        total,
+                        checkInTime: '14:00',
+                        checkOutTime: '12:00',
+                    },
+                });
+            },
+            onError: (error) => {
+                setErrorMessage(error.response?.data?.message || 'Booking failed');
             },
         });
     };
+
 
     const dismissError = () => {
         setErrorMessage('');
