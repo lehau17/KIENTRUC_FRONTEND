@@ -3,6 +3,7 @@ import { useState } from 'react';
 import EmployeeAdmin from 'routes/EmployeeAdmin/EmployeeAdmin';
 import RoomAdminPage from 'routes/RoomAdmin/RoomAdminPage';
 import Sidebar from './component/Sidebar';
+import InvoiceAdminPage from 'routes/InvoiceAdmin/InvoiceAdminPage';
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -17,7 +18,7 @@ const Admin = () => {
             case 'rooms':
                 return <RoomAdminPage />
             case 'invoices':
-                return <Title level={2}>Danh sách hóa đơn</Title>;
+                return <InvoiceAdminPage />;
             default:
                 return <Title level={2}>Trang quản trị</Title>;
         }
