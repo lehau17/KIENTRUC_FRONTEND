@@ -42,35 +42,47 @@ const CheckoutForm = () => {
 }
 
 async function fetchClientSecret() {
+    if (!bookingId) {
+        setErrorMessage('Thiếu booking ID để lấy client secret.');
+        return;
+    }
     const maxAttempts = 5;
-    const delayMs = 2000; // 2 giây giữa mỗi lần thử
+    const delayMs = 2000;
     let attempt = 0;
 
     while (attempt < maxAttempts) {
         try {
             const response = await axiosInstance.get(`/payment/user/${bookingId}/pending`);
-            const data = response?.data?.data;
+            if (!response || !response.data) {
+                setErrorMessage('Phản hồi từ backend không hợp lệ.');
+                return;
+            }
+            const clientSecret = response && response.data && response.data.data;
+            
+            console.log(`Attempt ${attempt + 1}:`, clientSecret);
 
-            console.log(`Attempt ${attempt + 1}:`, response);
-
-            if (data) {
-                setClientSecret(data);
-                return; // ✅ Thành công → thoát loop
+            if (clientSecret) {
+                setClientSecret(clientSecret); // Gán clientSecret
+                return;
+            } else {
+                console.warn('⚠️ Không có clientSecret trong response');
+                
             }
 
             attempt++;
             if (attempt < maxAttempts) {
-                await sleep(delayMs); // ⏳ chờ rồi thử lại
+                await sleep(delayMs);
             }
         } catch (error) {
             console.error('❌ Lỗi khi lấy client secret:', error);
             setErrorMessage('Lỗi khi lấy client secret: ' + error.message);
-            return; // ⛔ Không thử tiếp nếu lỗi request
+            return;
         }
     }
 
     setErrorMessage('Không thể lấy client secret từ backend sau 5 lần thử.');
 }
+
 
     // Lấy clientSecret từ backend dựa trên bookingId
     useEffect(() => {
@@ -119,28 +131,30 @@ async function fetchClientSecret() {
             setIsProcessing(false);
         } else {
             if (result.paymentIntent.status === 'succeeded') {
-                // Có thể gọi backend xác nhận nếu cần
-                try {
-                    const res = await networkAdapter.post('/api/payment/confirm-payment', {
-                        paymentIntentId: result.paymentIntent.id,
-                    });
+    try {
+        console.log("💳 paymentIntentId:", result.paymentIntent.id);
 
-                    if (res && res.data && (!res.errors || res.errors.length === 0)) {
-                        navigate(`/booking-confirmation?payment=success&hotel=${searchParams.get('hotelName')}`, {
-                            state: { confirmationData: res.data },
-                        });
-                    } else {
-                        setToastMessage('Xác nhận thanh toán backend thất bại.');
-                        setIsProcessing(false);
-                    }
-                } catch (err) {
-                    setToastMessage('Lỗi xác nhận backend: ' + err.message);
-                    setIsProcessing(false);
-                }
-            } else {
-                setErrorMessage('Thanh toán chưa hoàn tất. Trạng thái: ' + result.paymentIntent.status);
-                setIsProcessing(false);
-            }
+        const res = await axiosInstance.post('/payment/confirm-payment', {
+            clientSecret,
+        });
+
+        if (res && res.data && (!res.data.errors || res.data.errors.length === 0)) {
+            navigate(`/booking-confirmation?payment=success&hotel=${searchParams.get('hotelName')}`, {
+                state: { confirmationData: res.data },
+            });
+        } else {
+            setToastMessage('Xác nhận thanh toán backend thất bại.');
+            setIsProcessing(false);
+        }
+    } catch (err) {
+        setToastMessage('Lỗi xác nhận backend: ' + err.message);
+        setIsProcessing(false);
+    }
+} else {
+    setErrorMessage('Thanh toán chưa hoàn tất. Trạng thái: ' + result.paymentIntent.status);
+    setIsProcessing(false);
+}
+
         }
     };
 
