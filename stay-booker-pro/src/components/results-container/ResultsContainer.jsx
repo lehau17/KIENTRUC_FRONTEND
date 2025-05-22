@@ -34,7 +34,8 @@ export const VerticalFiltersData = [
         title: "Status",
         filters: [
             { id: "available", title: "Available", value: "available", isSelected: false },
-            { id: "unavailable", title: "Unavailable", value: "unavailable", isSelected: false },
+            { id: "maintenance", title: "maintenance", value: "maintenance", isSelected: false },
+            { id: "booked", title: "booked", value: "booked", isSelected: false },
         ],
     },
     {
@@ -131,12 +132,16 @@ const ResultsContainer = (props) => {
                                 <HotelViewCardSkeleton key={index} />
                             ))
                         ) : hotelsResults?.data?.data?.data?.length > 0 ? (
-                            hotelsResults?.data.data?.data?.map((hotel) => (
-                                <HotelViewCard
-                                    key={hotel._id}
-                                    hotel={hotel}
-                                />
-                            ))
+                            hotelsResults?.data.data?.data?.map((hotel) => {
+                                if (hotel.isActive) {
+                                    return <HotelViewCard
+                                        key={hotel._id}
+                                        hotel={hotel}
+                                    />
+                                }
+
+
+                            })
                         ) : (
                             <EmptyHotelsState />
                         )}

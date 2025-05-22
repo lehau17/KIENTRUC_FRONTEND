@@ -25,7 +25,6 @@ export const useRoomsAvailable = ({
                 data: response.data,
             };
         },
-        staleTime: 5 * 60 * 1000,
         keepPreviousData: true,
     });
 };

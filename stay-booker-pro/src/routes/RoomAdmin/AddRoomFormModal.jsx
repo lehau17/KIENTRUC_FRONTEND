@@ -100,7 +100,8 @@ const AddRoomFormModal = ({ visible, onClose, onSubmit }) => {
                 <Form.Item name="status" label="Status" rules={[{ required: true }]}>
                     <Select>
                         <Option value="available">Available</Option>
-                        <Option value="unavailable">Unavailable</Option>
+                        <Option value="maintenance">Maintenance</Option>
+                        <Option value="booked">Booked</Option>
                     </Select>
                 </Form.Item>
 

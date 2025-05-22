@@ -34,11 +34,7 @@ const EmployeeTable = ({ data, onEdit }) => {
             dataIndex: ['role', 'role'],
             key: 'role',
         },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-        },
+
         {
             title: 'Actions',
             key: 'actions',

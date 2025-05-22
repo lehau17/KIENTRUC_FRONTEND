@@ -5,7 +5,7 @@ import { useRooms } from 'hooks/useRooms';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SORTING_FILTER_LABELS } from 'utils/constants';
-
+import qs from 'qs';
 // Filter cứng
 export const VerticalFiltersData = [
     {
@@ -30,7 +30,8 @@ export const VerticalFiltersData = [
         title: "Status",
         filters: [
             { id: "available", title: "Available", value: "available", isSelected: false },
-            { id: "unavailable", title: "Unavailable", value: "unavailable", isSelected: false },
+            { id: "maintenance", title: "maintenance", value: "maintenance", isSelected: false },
+            { id: "booked", title: "booked", value: "booked", isSelected: false },
         ],
     },
     {
@@ -97,7 +98,7 @@ const HotelsSearch = () => {
 
     const isValidDate = (d) => d && !isNaN(new Date(d));
     const isUsingAvailable = isValidDate(checkInDate) && isValidDate(checkOutDate);
-    data.data = isUsingAvailable ? roomsAvailableQuery.data : allRoomsQuery.data;
+    data.data = isUsingAvailable ? roomsAvailableQuery.data : allRoomsQuery?.data?.data;
     const isLoading = isUsingAvailable ? roomsAvailableQuery.isLoading : allRoomsQuery.isLoading;
 
 

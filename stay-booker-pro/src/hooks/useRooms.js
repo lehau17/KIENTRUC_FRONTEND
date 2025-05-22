@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from 'api/instance';
+import qs from 'qs';
 
 /**
  * useRooms - Hook để lấy danh sách phòng từ API
@@ -15,16 +16,18 @@ export const useRooms = (filters = {}, page = 1, limit = 40) => {
     return useQuery({
         queryKey: queryKey,
         queryFn: async () => {
-            // 🚀 **Kết hợp params với pagination**
-            const params = {
-                ...filters,
-                page: page,
-                limit: limit,
-            };
-            console.log("check param:::", params)
+
 
             // ✅ **Gọi API**
-            const response = await axiosInstance.get('/room', { params });
+            const response = await axiosInstance.get('/room', {
+                params: {
+                    ...filters,  // ví dụ: { status: ['booked', 'available'] }
+                    page,
+                    limit,
+                },
+                paramsSerializer: (params) =>
+                    qs.stringify(params, { arrayFormat: 'repeat' }), // ✅ chuyển thành ?status=booked&status=available
+            });
 
             console.log("🔍 Data rooms response: ", response.data.data);
 
@@ -34,7 +37,6 @@ export const useRooms = (filters = {}, page = 1, limit = 40) => {
                 pagination: response.data.pagination,
             };
         },
-        staleTime: 300000, // Cache trong 5 phút
         keepPreviousData: true, // Giữ dữ liệu cũ khi gọi query mới
     });
 };

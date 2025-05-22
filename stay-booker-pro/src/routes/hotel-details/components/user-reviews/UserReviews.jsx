@@ -97,6 +97,9 @@ const UserReviews = ({
         reviewDataHook?.data?.filter((review) => review.rating === star).length
     );
 
+
+    console.log(reviewDataHook)
+
     return (
         <div className="flex flex-col p-4 border-t">
             <h1 className="text-xl font-bold text-gray-700">User Reviews</h1>
@@ -141,7 +144,7 @@ const UserReviews = ({
                             <Review
                                 key={index}
                                 reviewerName={review.user.name}
-                                reviewDate={review.createdAt}
+                                reviewDate={review.createdAt.split("T")[0]}
                                 review={review.comment}
                                 rating={review.rating}
                                 verified={review.verified}
