@@ -1,8 +1,9 @@
 import ResultsContainer from 'components/results-container/ResultsContainer';
 import PaginationController from 'components/ux/pagination-controller/PaginationController';
-import { useRooms } from 'hooks/useRooms'; // <-- Tối ưu gọi API Rooms
+import { useRoomsAvailable } from 'hooks/useRoomAvailable';
+import { useRooms } from 'hooks/useRooms';
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { SORTING_FILTER_LABELS } from 'utils/constants';
 
 // Filter cứng
@@ -54,7 +55,14 @@ const HotelsSearch = () => {
         label: 'Sort by',
     });
 
-    const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
+    const { numGuest, checkInDate, checkOutDate } = location.state || {};
+    const safeFormatDate = (inputDate) => {
+        const date = new Date(inputDate);
+        if (!inputDate || isNaN(date)) return '';
+        return date.toISOString().slice(0, 10); // yyyy-MM-dd
+    };
+
 
     const getActiveFilters = () => {
         const filters = {};
@@ -70,12 +78,32 @@ const HotelsSearch = () => {
         return filters;
     }
     // Query TanStack
-    const { data, isLoading } = useRooms({
+    const roomsAvailableQuery = useRoomsAvailable({
+        checkInAt: safeFormatDate(checkInDate),
+        checkOutAt: safeFormatDate(checkOutDate),
+
+    });
+
+
+
+
+    const allRoomsQuery = useRooms({
         page: currentResultsPage,
         limit: 40,
         sortBy: sortByFilterValue.value,
         ...getActiveFilters(),
     });
+    const data = {}
+
+    const isValidDate = (d) => d && !isNaN(new Date(d));
+    const isUsingAvailable = isValidDate(checkInDate) && isValidDate(checkOutDate);
+    data.data = isUsingAvailable ? roomsAvailableQuery.data : allRoomsQuery.data;
+    const isLoading = isUsingAvailable ? roomsAvailableQuery.isLoading : allRoomsQuery.isLoading;
+
+
+
+    console.log("check data found??", data)
+
 
     // Sort Options
     const sortingFilterOptions = [

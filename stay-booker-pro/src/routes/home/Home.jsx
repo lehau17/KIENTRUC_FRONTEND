@@ -1,12 +1,16 @@
 import ResultsContainer from 'components/results-container/ResultsContainer';
+import { format } from 'date-fns';
 import { useRooms } from 'hooks/useRooms';
 import _debounce from 'lodash/debounce';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MAX_GUESTS_INPUT_VALUE } from 'utils/constants';
-import { formatDate } from 'utils/date-helpers';
 import HeroCover from './components/hero-cover/HeroCover';
 
+const formatDateForApi = (date) => {
+    if (!date) return null; // hoặc '', tùy theo backend
+    return format(date, 'yyyy-MM-dd');
+};
 
 const Home = () => {
     const navigate = useNavigate();
@@ -78,8 +82,8 @@ const Home = () => {
      */
     const onSearchButtonAction = () => {
         const numGuest = Number(numGuestsInputValue);
-        const checkInDate = formatDate(dateRange[0].startDate) ?? '';
-        const checkOutDate = formatDate(dateRange[0].endDate) ?? '';
+        const checkInDate = formatDateForApi(dateRange[0].startDate);
+        const checkOutDate = formatDateForApi(dateRange[0].endDate);
         navigate('/hotels', {
             state: {
                 numGuest,
