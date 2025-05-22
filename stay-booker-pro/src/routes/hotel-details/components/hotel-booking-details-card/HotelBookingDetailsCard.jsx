@@ -6,7 +6,7 @@ import format from 'date-fns/format';
 import { useCreateBooking } from 'hooks/useBooking';
 import { useRoomDetail } from 'hooks/useRooms';
 import queryString from 'query-string';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { DEFAULT_TAX_DETAILS } from 'utils/constants';
@@ -111,11 +111,13 @@ const HotelBookingDetailsCard = ({ hotelCode }) => {
             roomId: hotelCode,
             checkInAt: checkIn,
             checkOutAt: checkOut,
-            price: taxes
+            price: Number(total.split(" ")[0]),
+            paymentMethod: "stripe"
         };
 
         createBooking(payload, {
-            onSuccess: () => {
+            onSuccess: (data) => {
+                console.log(data)
                 const queryParams = {
                     hotelCode,
                     checkIn: format(dateRange[0].startDate, 'dd-MM-yyyy'),
@@ -123,6 +125,7 @@ const HotelBookingDetailsCard = ({ hotelCode }) => {
                     guests: selectedGuests.value,
                     rooms: selectedRooms.value,
                     hotelName: bookingDetails.name.replaceAll(' ', '-'),
+                    bookingId: data.data.id
                 };
 
                 navigate(`/checkout?${queryString.stringify(queryParams)}`, {
@@ -134,6 +137,7 @@ const HotelBookingDetailsCard = ({ hotelCode }) => {
                 });
             },
             onError: (error) => {
+                console.log(error)
                 setErrorMessage(error.response?.data?.message || 'Booking failed');
             },
         });

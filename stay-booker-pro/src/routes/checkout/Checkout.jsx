@@ -13,6 +13,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { networkAdapter } from 'services/NetworkAdapter';
 import { getReadableMonthFormat } from 'utils/date-helpers';
 import FinalBookingSummary from './components/final-booking-summary/FinalBookingSummary';
+import axiosInstance from 'api/instance';
 
 const stripePromise = loadStripe('pk_test_51RP3KlRBrdlMwlulJ5t8wgP4c69WUckRnr0xyt3d1dnpXu1TB9E9AB5eVFqamk78GoIQYLK2LumE5HTjXpyV7fwm00metvjoGg');
 
@@ -36,6 +37,41 @@ const CheckoutForm = () => {
     // Giả sử bạn có bookingId trong URL hoặc location.state
     const bookingId = searchParams.get('bookingId') || location.state?.bookingId;
 
+    function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchClientSecret() {
+    const maxAttempts = 5;
+    const delayMs = 2000; // 2 giây giữa mỗi lần thử
+    let attempt = 0;
+
+    while (attempt < maxAttempts) {
+        try {
+            const response = await axiosInstance.get(`/payment/user/${bookingId}/pending`);
+            const data = response?.data?.data;
+
+            console.log(`Attempt ${attempt + 1}:`, response);
+
+            if (data) {
+                setClientSecret(data);
+                return; // ✅ Thành công → thoát loop
+            }
+
+            attempt++;
+            if (attempt < maxAttempts) {
+                await sleep(delayMs); // ⏳ chờ rồi thử lại
+            }
+        } catch (error) {
+            console.error('❌ Lỗi khi lấy client secret:', error);
+            setErrorMessage('Lỗi khi lấy client secret: ' + error.message);
+            return; // ⛔ Không thử tiếp nếu lỗi request
+        }
+    }
+
+    setErrorMessage('Không thể lấy client secret từ backend sau 5 lần thử.');
+}
+
     // Lấy clientSecret từ backend dựa trên bookingId
     useEffect(() => {
         if (!bookingId) {
@@ -43,19 +79,6 @@ const CheckoutForm = () => {
             return;
         }
 
-        async function fetchClientSecret() {
-            try {
-                const response = await networkAdapter.get(`/api/payment/user/${bookingId}/pending`);
-
-                if (response && response.data && response.data.clientSecret) {
-                    setClientSecret(response.data.clientSecret);
-                } else {
-                    setErrorMessage('Không thể lấy client secret từ backend');
-                }
-            } catch (error) {
-                setErrorMessage('Lỗi khi lấy client secret: ' + error.message);
-            }
-        }
 
         fetchClientSecret();
     }, [bookingId]);
